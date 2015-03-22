@@ -1,0 +1,92 @@
+#!/bin/sh
+
+CGMINER_BIN=`which cgminer`
+BFGMINER_BIN=`which bfgminer`
+CONFIG_FILE=/usr/local/bin/.miner_opts.sh
+
+whiptail --msgbox "Welcome to the RPi controller for Zeus ASIC miners! The
+following menus will walk you through getting your miners up and running quickly." 12 75 1
+
+whiptail --msgbox "Note that the configuration dialog accepts arguments as they are provided and peforms only minimal input validation.\n
+After the configuration has completed and your RPi reboots, ensure that the miner is running correctly using 'screen -r'" 14 75 1
+
+MINER=$(whiptail --radiolist "Select mining package to use" 18 75 10 --title "Miner Configuration" "cg" "cgminer 4.3.5         " ON "bfg" "bfgminer 4.6.0        " OFF 3>&1 1>&2 2>&3)
+        if [ $? -eq 0 ]; then
+                case "$MINER" in
+                        "cg")
+                                ;;
+                        "bfg")
+                                ;;
+                        *)
+                                whiptail --msgbox "Invalid option" 12 50 2
+                                return 1
+                                ;;
+                        esac
+                else
+                        exit
+        fi
+
+ASIC_TYPE=$(whiptail --radiolist "Select ASIC miner" 18 75 10 --title "Miner Configuration" "blizzard" "Zeus Blizzard / GAW Fury             " ON 3>&1 1>&2 2>&3)
+        if [ $? -eq 0 ]; then
+                case "$ASIC_TYPE" in
+                "blizzard")
+                        ASIC_CHIPS=6
+                        ASIC_CLOCK=328
+                        ;;
+                *)
+                        whiptail --msgbox "Invalid option" 12 50 2
+                        return 1
+                        ;;
+                esac
+        else
+                exit
+        fi
+
+        while [ ! "${SERVER}" ]; do
+                SERVER=$(whiptail --inputbox "Enter mining host and port\n(example: stratum+tcp://pool.example.com:3333)" 8 75 "stratum+tcp://" --title "Miner Configuration" 3>&1 1>&2 2>&3)
+                if [ $? -eq 1 ]; then
+                        exit
+                fi
+        done
+
+        while [ ! "${MINER_USER}" ]; do
+                MINER_USER=$(whiptail --inputbox "Enter username" 8 75 --title "Miner Configuration" 3>&1 1>&2 2>&3)
+                if [ $? -eq 1 ]; then
+                        exit
+                fi
+        done
+
+        while [ ! "${MINER_PASS}" ]; do
+                MINER_PASS=$(whiptail --inputbox "Enter password" 8 75 --title "Miner Configuration" 3>&1 1>&2 2>&3)
+                if [ $? -eq 1 ]; then
+                        exit
+                fi
+        done
+
+BFGMINER_CONF="${BFGMINER_BIN} --scrypt -S zeusminer:all --set zeusminer:clock=${ASIC_CLOCK} --set zeusminer:chips=${ASIC_CHIPS} -o ${SERVER} -u ${MINER_USER} -p ${MINER_PASS}"
+CGMINER_CONF="${CGMINER_BIN} --scrypt --scan-serial zeus:auto --zeus-clock ${ASIC_CLOCK} --zeus-chips ${ASIC_CHIPS} -o ${SERVER} -u ${MINER_USER} -p ${MINER_PASS}"
+
+case "$MINER" in
+"cg")
+        echo ${CGMINER_CONF} > ${CONFIG_FILE}
+        chmod +x ${CONFIG_FILE}
+        ;;
+"bfg")
+        echo ${BFGMINER_CONF} > ${CONFIG_FILE}
+        chmod +x ${CONFIG_FILE}
+        ;;
+*)
+        whiptail --msgbox "Configuration failed" 12 50 2
+        exit
+        ;;
+esac
+
+whiptail --yesno "Would you like to reboot now?" 20 60 2
+if [ $? -eq 0 ]; then
+        killall -TERM cgminer
+        killall -TERM bfgminer
+        sleep 5
+        sync
+        reboot
+fi
+exit 0

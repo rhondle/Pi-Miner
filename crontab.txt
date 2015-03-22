@@ -1,0 +1,1 @@
+@reboot /usr/bin/screen -AmdS miner /usr/local/bin/start-miner.sh

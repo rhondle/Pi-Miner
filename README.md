@@ -28,6 +28,12 @@
  * bfgminer: `--enable-scrypt --disable-other-drivers --enable-icarus --enable-zeusminer`
 5. Copy `miner-setup` and `start-miner.sh` to `/usr/local/bin/`
 6. Add an entry to root's crontab (see `crontab.txt`) if you want the miner to automatically start on boot.
+7. Connect a supported miner and run `sudo miner-setup` to configure.
+8. Reboot, then run `sudo screen -r` to confirm the miner(s) are running properly. (http://bit.ly/1xTZdVk for instructions on using screen)
+
+
+
+
 
 
 

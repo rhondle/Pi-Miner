@@ -1,8 +1,8 @@
 # Pi-Miner
 
-####A simple, guided configuration tool for a Raspberry Pi based Zeus/Gaw Scrypt miner
+### A simple, guided configuration tool for a Raspberry Pi based Zeus/Gaw Scrypt miner
 
-#####Supports
+#### Supports
 * Zeus & Gaw Scrypt miners
 * Fury/Blizzard*
 * Black Widow*
@@ -11,14 +11,14 @@
 
 (*) Tested
 
-#####Requirements:
+#### Requirements:
 * Raspberry Pi + Rasbian
 * build environment
 * cgminer or bfgminer (compiled with Zeus support)
 * screen
 * whiptail (installed by default)
 
-#####Installation Instructions:
+#### Installation Instructions:
 1. Download and install Raspbian to an SD card
 2. Update (`sudo apt-get update && apt-get upgrade`)
 3. Install build environment
